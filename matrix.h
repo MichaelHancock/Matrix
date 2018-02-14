@@ -1,106 +1,245 @@
 #pragma once
+
+template <class T >
 class matrix
 {
 private:
-	//Private data members
+	T* data;
 	int sizeR;
 	int sizeC;
-	double* data;
-	
-	//Defualt constructor cannot be called
-	matrix();
-
-	/* --- Private member functions --- */
-	template <class swappable>
-	void swap(swappable &data1, swappable &data2);
 
 public:
-	/* --- Constructors --- */
+	matrix()
+	{
+		sizeR = 0;
+		sizeC = 0;
+	}
 
-	//Construct matrix object with row and column values
-	matrix(int rows, int columns);
-	//Construct matrix object with given matrix object (copy constructor)
-	matrix(const matrix& mat);
-	//Construct matrix object with rows, columns and a intial value
-	matrix(int rows, int columns, double value);
-	//Construct matrix object with rows, columns and a intial set of values
-	matrix(int rows, int columns, double* values);
+	matrix(int rows, int columns)
+	{
+		sizeR = rows;
+		sizeC = columns;
+		data = new T[sizeR * sizeC];
+	}
 
-	/* --- Public member functions --- */
+	matrix(int rows, int columns, T initialValue)
+	{
+		sizeR = rows;
+		sizeC = columns;
+		data = new T[sizeR * sizeC];
 
-	//Get sum product of all values in matrix
-	double sum();
-	//Get largest value from matrix
-	double max();
-	//Get smallest value from matrix
-	double min();
-	//Get product value from matrix
-	double product();
-	//Get range value from matrix
-	double range();
-	//Get mean value from matrix
-	double mean();
-	//Get standard deviation value from matrix
-	double standardDeviation();
-	//Get middle value from matrix
-	double median();
-	//Get count of all rows in matrix
-	int rowCount();
-	//Get count of all columns in matrix
-	int colCount();
-	//Get data from a given index in matrix
-	double get(int i, int j);
-	//Get all data from matrix in array form
-	double* getData();
-	//Get sub-matrix of data between given coordinates
-	matrix getBlock(int row1, int col1, int row2, int col2);
-	//Set a single value at given coordinate
-	void set(int i, int j, double value);
-	//Set a block of data to equal a value
-	void setBlock(int row1, int col1, int row2, int col2, double value);
-	//Set a block of data to equal values of a given matrix
-	void setBlock(int row1, int col1, matrix& mat);
-	//Flip matrix about the horizontal axis
-	void flipUD();
-	//Flip matrix about the vertical axis
-	void flipLR();
-	//Rotate 90 degrees clockwise
-	void rotateClockwise();
-	//Convert matrix to binary values using given threshold
-	void toBinary(int threshold);
-	//Get a binary copy of the current matrix
-	matrix getBinary(int threshold);
-	//Reverse the order of the values in the matrix 
-	void reverse();
-	//Sort values of matrix into ascending order
-	void sortUp();
-	//Sort values of matrix into descending order
-	void sortDown();
-	//Get an ascending sorted copy of current matrix
-	matrix getSortUp();
-	//Get an descending sorted copy of current matrix
-	matrix getSortDown();
-	//Add 1 index thick border of given value
-	void addBorder(double borderValue);
-	//Remove 1 index thick border from the matrix
-	void removeBorder();
-	//Check if a value is contained inside the matrix
-	bool elem(double element);
+		for (int i = 0; i < sizeR * sizeC; i++)
+		{
+			data[i] = initialValue;
+		}
+	}
 
-	/* --- Public member operator functions ---*/
+	matrix(const matrix& mat)
+	{
+		sizeR = mat.sizeR;
+		sizeC = mat.sizeC;
+		data = new T[sizeR * sizeC];
 
-	matrix operator=(const matrix& mat);
-	matrix operator+(const matrix& mat);
-	matrix operator-(const matrix& mat);
-	matrix operator++();
-	matrix operator--();
-	bool operator==(const matrix& mat);
-	bool operator!=(const matrix& mat);
-	matrix operator*(const matrix& mat);
-	matrix operator/(const matrix& mat);
-	double operator()(int i, int j);
+		for (int i = 0; i < sizeR * sizeC; i++)
+		{
+			data[i] = mat.data[i];
+		}
+	}
 
-	//Destructor
-	~matrix();
+	int rows() const
+	{
+		return sizeR;
+	}
+
+	int columns() const
+	{
+		return sizeC;
+	}
+	
+	void set(int m, int n, T value)
+	{
+		if (m >= sizeR || n >= sizeC || sizeR < 0 || sizeC < 0) 
+		{
+			throw std::out_of_range("Matix position arguments are out of range");
+		}
+
+		data[(m * sizeC) + n] = value;
+	}
+
+	void setBlock(int row1, int col1, int row2, int col2, T value)
+	{
+		for (int i = row1; i <= row2; i++)
+		{
+			for (int j = col1; j <= col2; j++)
+			{
+				set(i, j, value);
+			}
+		}
+	}
+
+	void setBlock(int row1, int col1, matrix& mat)
+	{
+		int indexRow = 0;
+		int indexCol = 0;
+		int row2 = row1 + mat.sizeR - 1;
+		int col2 = col1 + mat.sizeC - 1;
+
+		for (int i = row1; i <= row2; i++)
+		{
+			for (int j = col1; j <= col2; j++)
+			{
+				set(i, j, mat.get(indexRow, indexCol));
+				indexCol++;
+			}
+		
+			indexCol = 0;
+			indexRow++;
+		}
+	}
+
+	T get(int m, int n) const
+	{
+		if (m >= sizeR || n >= sizeC || sizeR < 0 || sizeC < 0) 
+		{
+			throw std::out_of_range("Matix position arguments are out of range");
+		}
+
+		return data[(m * sizeC) + n];
+	}
+	
+	matrix getBlock(int row1, int col1, int row2, int col2) const
+	{
+		if (row1 >= row2 || col1 >= col2)
+		{
+			throw std::invalid_argument("Provided arguments are invalid. row1 < row2 and col1 < col2");
+		}
+
+		if (row1 < 0 || col1 < 0 || row2 < 0 || col2 < 0 || row2 >= sizeR || col2 >= sizeC) 
+		{
+			throw std::out_of_range("Matix position arguments are out of range");
+		}
+
+
+		matrix result = matrix(row2 - row1 + 1, col2 - col1 + 1);
+		int indexRow = 0;
+		int indexCol = 0;
+
+		for (int i = row1; i <= row2; i++)
+		{
+			for (int j = col1; j <= col2; j++)
+			{
+				result.set(indexRow, indexCol, get(i, j));
+				indexCol++;
+			}
+
+			indexRow++;
+			indexCol = 0;
+		}
+
+		return result;
+	}
+
+	void addRow()
+	{
+		const int sizeBeforeAdd = sizeR * sizeC;
+		const int sizeAfterAdd = (sizeR + 1) * sizeC;
+		sizeR++;
+
+		T * dataCopy = new T[sizeAfterAdd];
+		memcpy(dataCopy, data, sizeof(data[0]));
+		
+		delete[] data;
+		data = dataCopy;
+	}
+
+	void addColumn()
+	{
+		const int sizeBeforeAdd = sizeR * sizeC;
+		const int sizeAfterAdd = sizeR * (sizeC + 1);
+		sizeC++;
+
+		T * dataCopy = new T[sizeAfterAdd];
+		memcpy(dataCopy, data, sizeof(data[0]));
+
+		delete[] data;
+		data = dataCopy;
+	}
+
+	void reverse()
+	{
+		const int matrixSize = sizeR * sizeC;
+		const int numberOfSwapsRequired = matrixSize % 2 == 0 ? (int)matrixSize / 2 : (int)floor(matrixSize / 2);
+
+		for (int i = 0; i < numberOfSwapsRequired; i++)
+		{
+			const T toSwap = data[i];
+			const int upperSwapIndex = (matrixSize - 1) - i;
+
+			data[i] = data[upperSwapIndex];
+			data[upperSwapIndex] = toSwap;
+		}
+	}
+
+	void clear()
+	{
+		sizeR = 0;
+		sizeC = 0;
+
+		delete[] data;
+		data = new T[0];
+	}
+
+	T operator()(int m, int n) const
+	{
+		return get(m, n);
+	}
+
+	matrix operator=(const matrix& mat)
+	{
+		if (mat.sizeR == sizeR && mat.sizeC == sizeC)
+		{
+			for (int i = 0; i < sizeR * sizeC; i++)
+			{
+				data[i] = mat.data[i];
+			}
+
+			return *this;
+		}
+
+		delete[] data;
+
+		sizeR = mat.sizeR;
+		sizeC = mat.sizeC;
+		data = new T[sizeR * sizeC];
+
+		for (int i = 0; i < sizeR * sizeC; i++)
+		{
+			data[i] = mat.data[i];
+		}
+
+		return *this;
+	}
+
+	bool operator==(const matrix& mat) const
+	{
+		if (sizeR != mat.sizeR || sizeC != mat.sizeC)
+		{
+			return false;
+		}
+
+		for (int i = 0; i < sizeR * sizeC; i++)
+		{
+			if (data[i] != mat.data[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	~matrix()
+	{
+		delete[] data;
+	}
 };
-
