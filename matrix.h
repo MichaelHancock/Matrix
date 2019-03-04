@@ -58,7 +58,7 @@ public:
 	
 	void set(int m, int n, T value)
 	{
-		if (m >= sizeR || n >= sizeC || sizeR < 0 || sizeC < 0) 
+		if (m >= sizeR || n >= sizeC) 
 		{
 			throw std::out_of_range("Matix position arguments are out of range");
 		}
@@ -99,7 +99,7 @@ public:
 
 	T get(int m, int n) const
 	{
-		if (m >= sizeR || n >= sizeC || sizeR < 0 || sizeC < 0) 
+		if (m >= sizeR || n >= sizeC) 
 		{
 			throw std::out_of_range("Matix position arguments are out of range");
 		}
