@@ -114,7 +114,7 @@ public:
 			throw std::invalid_argument("Provided arguments are invalid. row1 < row2 and col1 < col2");
 		}
 
-		if (row1 < 0 || col1 < 0 || row2 < 0 || col2 < 0 || row2 >= sizeR || col2 >= sizeC) 
+		if (row1 < 0 || col1 < 0 || row2 >= sizeR || col2 >= sizeC) 
 		{
 			throw std::out_of_range("Matix position arguments are out of range");
 		}
