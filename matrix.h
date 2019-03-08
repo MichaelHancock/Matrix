@@ -119,7 +119,6 @@ public:
 			throw std::out_of_range("Matix position arguments are out of range");
 		}
 
-
 		matrix result = matrix(row2 - row1 + 1, col2 - col1 + 1);
 		int indexRow = 0;
 		int indexCol = 0;
